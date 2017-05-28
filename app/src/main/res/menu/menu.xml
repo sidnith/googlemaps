@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.sidharth.googlemapsdemo.MainActivity">
+
+    <item android:id="@+id/mapNone"
+       android:title="@string/map_type_none" />
+
+    <item android:id="@+id/mapNormal"
+        android:title="@string/map_type_normal" />
+
+    <item android:id="@+id/mapTerrain"
+        android:title="@string/map_type_terrain" />
+
+    <item android:id="@+id/mapSatellite"
+        android:title="@string/map_type_satellite" />
+
+    <item android:id="@+id/mapHybrid"
+        android:title="@string/map_type_hybrid" />
+
+</menu>
