@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     GoogleMap mgoogleMap;
     GoogleApiClient mgoogleApiClient;
+    View vieww;
 
 
     @Override
@@ -53,6 +55,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } else {
             Toast.makeText(this, "Google Maps not supported", Toast.LENGTH_SHORT).show();
         }
+
+        EditText edittext=(EditText)findViewById(R.id.editText);
+        edittext.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    try {
+                        geolocate(vieww);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return true;
+                }
+                return false;
+            }
+            });
     }
 
     private void initMap() {
@@ -79,6 +96,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mgoogleMap = googleMap;
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        mgoogleMap.setMyLocationEnabled(true);
         //goToLocationZoom(13.0216515,77.6004307,15);
         mgoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this).build();
@@ -101,18 +129,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void geolocate(View view) throws IOException {
         EditText ed = (EditText) findViewById(R.id.editText);
         String loc = ed.getText().toString();
+        if(loc.length()==0){
+            Toast.makeText(this,"Nothing entered yet",Toast.LENGTH_SHORT).show();;
+        }
+        else {
+            Geocoder gd = new Geocoder(this);
+            List<android.location.Address> list = gd.getFromLocationName(loc, 1);
+            android.location.Address address = list.get(0);
+            String locality = address.getLocality();
 
-        Geocoder gd = new Geocoder(this);
-        List<android.location.Address> list = gd.getFromLocationName(loc, 1);
-        android.location.Address address = list.get(0);
-        String locality = address.getLocality();
+            Toast.makeText(this, locality, Toast.LENGTH_SHORT).show();
 
-        Toast.makeText(this, locality, Toast.LENGTH_SHORT).show();
-
-        double lat = address.getLatitude();
-        double lon = address.getLongitude();
-        goToLocationZoom(lat, lon, 15);
-
+            double lat = address.getLatitude();
+            double lon = address.getLongitude();
+            goToLocationZoom(lat, lon, 15);
+        }
 
     }
 
